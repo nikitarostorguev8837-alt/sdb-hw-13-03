@@ -1,64 +1,30 @@
-# Домашнее задание к занятию "`Уязвимости и атаки на информационные системы`" - `Росторгуев Никита`
+# Домашнее задание к занятию "`Защита сети`" - `Росторгуев Никита`
 
 ---
 
 ### Задание 1
 
-```bash
-PORT     STATE SERVICE     VERSION  
-21/tcp   open  ftp         vsftpd 2.3.4  
-22/tcp   open  ssh         OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)  
-23/tcp   open  telnet      Linux telnetd  
-25/tcp   open  smtp        Postfix smtpd
-53/tcp   open  domain      ISC BIND 9.4.2
-80/tcp   open  http        Apache httpd 2.2.8 ((Ubuntu) DAV/2)
-111/tcp  open  rpcbind     2 (RPC #100000)
-139/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
-445/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
-512/tcp  open  exec        netkit-rsh rexecd
-513/tcp  open  login
-514/tcp  open  tcpwrapped
-1099/tcp open  java-rmi    GNU Classpath grmiregistry
-1524/tcp open  bindshell   Metasploitable root shell
-2049/tcp open  nfs         2-4 (RPC #100003)
-2121/tcp open  ftp         ProFTPD 1.3.1
-3306/tcp open  mysql       MySQL 5.0.51a-3ubuntu5
-5432/tcp open  postgresql  PostgreSQL DB 8.3.0 - 8.3.7
-5900/tcp open  vnc         VNC (protocol 3.3)
-6000/tcp open  X11         (access denied)
-6667/tcp open  irc         UnrealIRCd
-8009/tcp open  ajp13       Apache Jserv (Protocol v1.3)
-8180/tcp open  http        Apache Tomcat/Coyote JSP engine 1.1
-```
+Выполнил разведку системы:  
+- sudo nmap -sA 192.168.3.42  
+- sudo nmap -sT 192.168.3.42  
+- sudo nmap -sS 192.168.3.42  
+- sudo nmap -sV 192.168.3.42  
 
-- https://www.exploit-db.com/exploits/17491 - эксплоит к vsftpd 2.3.4. Позволяет получить удаленный доступ к системе  
-- https://www.exploit-db.com/exploits/42060 - Samba smbd 3.x - 4.x. Удаленное выполнение команд
-- https://www.exploit-db.com/exploits/16922 - UnrealIRCd. Позволяет получить удаленный доступ к системе
+В ходе выполнения сканирования с атакующей машины (192.168.3.43) на защищаемую систему (192.168.3.42).  
+Suricata успешно зафиксировала следующие типы сканирования:  
+SYN SCAN DETECTED (sid:1000002) — SYN-сканирование (nmap -sS)  
+TCP CONNECT SCAN DETECTED (sid:1000004) — TCP Connect сканирование (nmap -sT)  
+ACK SCAN DETECTED (sid:1000003) — ACK-сканирование (nmap -sA)  
+Также зафиксирован общий TCP-трафик (TCP TRAFFIC DETECTED, sid:1000005), который может указывать на попытку определения версий служб (nmap -sV).  
+Все алерты содержат информацию об IP-адресах источника и назначения, а также о портах, что позволяет идентифицировать сканируемые службы. В логах видно, что атаки также осуществлялись с IP-адреса 192.168.3.40.  
+![Скриншот](https://github.com/nikitarostorguev8837-alt/sdb-hw-13-03/blob/main/img/scan.png)   
+
+
+В ходе выполнения задания Fail2Ban не зафиксировал блокировок, так как сканирование портов (nmap) не является попыткой аутентификации  
 
 ---
 
 ### Задание 2
 
-#### Чем отличаются эти режимы сканирования с точки зрения сетевого трафика:
-
-*SYN*: Cканер отправляет SYN-пакеты и в ответ получает либо SYN-ACK (порт открыт), либо RST (порт закрыт). Сканер не отправляет финальный ACK для завершения трехстороннего рукопожатия  
-![Скриншот](https://github.com/nikitarostorguev8837-alt/sdb-hw-12-07/blob/main/img/syn.png)   
-
-*FIN*: Вместо SYN отправляются пакеты с флагом FIN. Ответ для закрытых портов — RST  
-![Скриншот](https://github.com/nikitarostorguev8837-alt/sdb-hw-12-07/blob/main/img/fin.png)  
-
-*Xmas*: Отправляются пакеты с нестандартной комбинацией флагов (FIN, PSH, URG). Закрытые порты также отвечают RST  
-![Скриншот](https://github.com/nikitarostorguev8837-alt/sdb-hw-12-07/blob/main/img/xmas.png)
-
-*UDP*: Трафик состоит из UDP-датаграмм. Вместо TCP-ответов, можно ICMP-пакеты с ошибкой Port Unreachable от сервера для закрытых портов  
-![Скриншот](https://github.com/nikitarostorguev8837-alt/sdb-hw-12-07/blob/main/img/udp.png)
-
-#### Как отвечает сервер
-
-*SYN*: Открытый порт: SYN-ACK; Закрытый порт: RST
-
-*FIN/Xmas*: Открытый порт: Нет ответа; Закрытый порт: RST
-
-*UDP*: Открытый порт: Нет ответа или ответ по протоколу приложения; Закрытый порт: ICMP Port Unreachable
 
 ---
