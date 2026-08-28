@@ -24,7 +24,17 @@ ACK SCAN DETECTED (sid:1000003) — ACK-сканирование (nmap -sA)
 
 ---
 
-### Задание 2
+### Задание 2  
 
+**Логи Fail2Ban**  
+Обнаружение: Система зафиксировала 2 неудачные попытки входа с IP 192.168.3.43 за долю секунды  
+Блокировка: IP был забанен через 0.11 секунды после второй попытки (сработало правило maxretry = 3)  
+Результат: Атака остановлена, все последующие попытки с этого IP игнорируются  
+![Скриншот](https://github.com/nikitarostorguev8837-alt/sdb-hw-13-03/blob/main/img/ban.png)    
+![Скриншот](https://github.com/nikitarostorguev8837-alt/sdb-hw-13-03/blob/main/img/ban2.png)  
+
+**Логи Suricata**  
+Обнаружение: Система зафиксировала множественные попытки входа:  
+![Скриншот](https://github.com/nikitarostorguev8837-alt/sdb-hw-13-03/blob/main/img/sur.png)  
 
 ---
